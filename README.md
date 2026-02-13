@@ -8,49 +8,46 @@ A lightweight app for finding fast-growing YouTube niches with:
 ## Local Run
 
 ```bash
+npm install
 npm start
 ```
 
 Open `http://localhost:3000`.
 
-## Deploy Guide
+## Auto Deploy (No manual redeploy needed)
 
-### 1) Quick deploy on Railway / Render (recommended)
-1. Push this repo to GitHub.
-2. Create a new Web Service and connect your repo.
-3. Use these settings:
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-   - **Port:** `3000` (or platform default via `PORT` env)
-4. Deploy.
-5. Verify health check URL: `/health`.
+I have added GitHub Actions based auto-deploy for Render.
+After one-time setup, every push to branch `work` will auto deploy.
 
-This app reads `process.env.PORT`, so it works on most Node hosting platforms without changes.
+### One-time setup (5–10 min)
+1. Push this repo to your GitHub account.
+2. Create a **Render Web Service** connected to this repo.
+3. In Render service settings, copy **Service ID**.
+4. Create a Render API key from account settings.
+5. In GitHub repo → **Settings → Secrets and variables → Actions**, add:
+   - `RENDER_API_KEY`
+   - `RENDER_SERVICE_ID`
+6. Done. Now every push to `work` branch runs:
+   - install
+   - checks
+   - deploy trigger
 
-### 2) VPS deploy (Ubuntu + PM2)
-```bash
-# on server
-sudo apt update && sudo apt install -y nodejs npm git
-npm install -g pm2
+Workflow file: `.github/workflows/deploy-render.yml`
 
-git clone <your-repo-url>
-cd Coding
-npm install
-pm2 start server.js --name niche-research
-pm2 save
-pm2 startup
-```
+## Manual fallback deploy (if needed)
 
-Optional Nginx reverse proxy to `localhost:3000` for domain + SSL.
+### Render/Railway
+- Build command: `npm install`
+- Start command: `npm start`
+- Port: from `PORT` env (already supported)
+- Health check path: `/health`
 
-### 3) Docker deploy
+### Docker
 ```bash
 docker build -t niche-research-tool .
 docker run -d -p 3000:3000 --name niche-research niche-research-tool
 ```
 
-Then open `http://<server-ip>:3000`.
-
-## Notes
-- The app attempts live YouTube search parsing.
-- If network/proxy blocks YouTube, it automatically switches to a fallback dataset so your workflow still runs.
+## Important note
+- Main aapke personal Render/GitHub account me direct login karke deploy start nahi kar sakta without your credentials.
+- Lekin repo me auto-deploy pipeline fully configured hai; aap sirf secrets add karo, baqi deploy automatic ho jayega.
